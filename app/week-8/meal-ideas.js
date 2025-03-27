@@ -1,47 +1,53 @@
-"use client"
-
-import { useState, useEffect } from "react";
-
-const MealIdeas = ({ ingredient }) => {
-  const [meals, setMeals] = useState([]);
-
-  const fetchMealIdeas = async (ingredient) => {
-    try {
-      const response = await fetch(
-        `https://www.themealdb.com/api/json/v1/1/filter.php?i=${ingredient}`
-      );
-      const data = await response.json();
-      return data.meals || [];
-    } catch (error) {
-      console.error("Error fetching meal ideas:", error);
-      return [];
-    }
-  };
-
-  const loadMealIdeas = async () => {
-    const mealData = await fetchMealIdeas(ingredient);
-    setMeals(mealData);
-  };
-
-  useEffect(() => {
-    if (ingredient) {
-      loadMealIdeas();
-    }
-  }, [ingredient]);
-
-  return (
-    <div>
-      <h2>Meal Ideas for {ingredient}</h2>
-      <ul>
-        {meals.map((meal) => (
-          <li key={meal.idMeal}>
-            <img src={meal.strMealThumb} alt={meal.strMeal} width="50" height="50" />
-            {meal.strMeal}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-};
-
-export default MealIdeas;
+"use client";
+ import { useState, useEffect } from 'react';
+ 
+ // Function to fetch meal ideas from TheMealDB API
+ const fetchMealIdeas = async (ingredient) => {
+   if (!ingredient) return [];
+   
+   try {
+     const response = await fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?i=${ingredient}`);
+     const data = await response.json();
+     return data.meals || [];
+   } catch (error) {
+     console.error("Error fetching meal ideas:", error);
+     return [];
+   }
+ };
+ 
+ export default function MealIdeas({ ingredient }) {
+   const [meals, setMeals] = useState([]);
+ 
+   // Function to load meal ideas
+   const loadMealIdeas = async () => {
+     const mealIdeas = await fetchMealIdeas(ingredient);
+     setMeals(mealIdeas);
+   };
+ 
+   // Call loadMealIdeas whenever the ingredient changes
+   useEffect(() => {
+     loadMealIdeas();
+   }, [ingredient]);
+ 
+   return (
+     <div>
+       <h2 className="text-xl font-bold mb-4">Meal Ideas for {ingredient}</h2>
+       {!ingredient && <p>Select an item to see meal ideas</p>}
+       {ingredient && meals.length === 0 && <p>No meal ideas found for {ingredient}</p>}
+       <ul className="divide-y">
+         {meals.map((meal) => (
+           <li key={meal.idMeal} className="py-2">
+             <div className="flex items-center gap-2">
+               <img 
+                 src={meal.strMealThumb} 
+                 alt={meal.strMeal}
+                 className="w-12 h-12 rounded-full object-cover"
+               />
+               <span>{meal.strMeal}</span>
+             </div>
+           </li>
+         ))}
+       </ul>
+     </div>
+   );
+ }
