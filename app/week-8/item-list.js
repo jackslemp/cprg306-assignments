@@ -2,7 +2,7 @@
  import Item from "./item";
  import React, { useState } from "react";
  
- export function ItemList({ items }) {
+ export function ItemList({ items, onItemSelect }) {
    const [sortBy, setSortBy] = useState("name");
  
    const handleSortchange = (newSortBy) => {
